@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+
+int main()
+{
+    int x = 20;
+    int y = 20;
+    char input;
+    int i, j;
+    int isFire = 0;
+
+    int target = 1;
+    int isKilled = 0;//靶子
+    int targetVel =1;
+    int targetDirection = 1; // 1向右边，-1向左边
+    int score = 0;
+
+
+    while(1)
+    {
+        system("cls");  // 清屏函数
+         target += targetVel * targetDirection;
+
+        if(!isKilled)  //输出靶子
+        {
+            for (j=0;j<target;j++)
+
+                printf(" ");
+        printf("+ \n");
+
+        }
+        printf("Your Score: %d",score);
+
+        if (isFire == 0)  // 输出飞机上面的空行
+        {
+            for (i = 0; i < x; i++)
+                printf("\n");
+        }
+        else  // 输出飞机上面的激光
+        {
+            for (i = 0; i < x; i++)
+            {
+                for (j = 0; j < y; j++)
+                    printf(" ");
+                printf("  *\n");
+            }
+            if (y + 2 == target)
+                isKilled = 1;
+            if (isKilled ==1){
+                score ++;
+            }
+            isFire = 0;
+
+        }
+
+
+        // 画飞机
+        for (j = 0; j < y; j++)
+            printf(" ");
+        printf("  *\n");
+        for (j = 0; j < y; j++)
+            printf(" ");
+        printf("*****\n");
+
+        if (target + targetDirection > 50 || target + targetDirection < 1)
+            targetDirection *= -1;
+
+
+        if (kbhit())  // 判断是否输入
+        {
+            input = getch();
+            if (input == 'a')
+                y--;
+            if (input == 'd')
+                y++;
+            if (input == 'w')
+                x--;
+            if (input == 's')
+                x++;
+            if (input == ' ')
+                isFire = 1;
+        }
+    }
+
+    return 0;
+}
