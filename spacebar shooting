@@ -1,87 +1,126 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <windows.h>
+//hide cursor
+void HideCursor()
+{
+    CONSOLE_CURSOR_INFO cursor_info = {1,0};//second 0 to hide cursor
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
+}
+
+//global variable
+int position_x;position_y; //plane position
+int high,width; //game window
+int bullet_x,bullet_y;//bullet
+int enemy_x,enemy_y; //enemy
+int score; //add score
+
+void gotoxy(int x, int y) //move to x,y
+{
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos;
+    pos.X = x;
+    pos.Y = y;
+    SetConsoleCursorPosition(handle,pos);
+}
+
+void starup()
+{
+    high = 20;
+    width = 30;
+    position_x = high/2;
+    position_y = width/2;
+    enemy_x = 0;
+    enemy_y = position_y;
+    score =0;
+}
+
+void show() //show game
+{
+    system("cls");
+    int i,j;
+    for(i=0;i<high;i++)
+    {
+        for(j=0;j< width;j++)
+        {
+            if((i==position_x)&&(j==position_y))
+                printf("-*-");//print plane
+            else if((i==enemy_x)&&(j==enemy_y))
+                printf("@");//printf enemy
+
+            else if((i==bullet_x)&&(j==bullet_y))
+                printf("|");//print bullet
+            else
+                printf(" "); //print space
+        }
+        printf("\n");
+    }
+    printf("Score: %d\n",score);
+
+}
+
+void updateWithoutInput() //update without user input
+{
+    if(bullet_x > -1)
+        bullet_x--;
+    if((bullet_x == enemy_x)&&(bullet_y == enemy_y))
+    {
+        score++;
+        enemy_x = -1;//new enemy
+        enemy_y = rand()%width;
+        bullet_x = -2; //invald bullet
+    }
+    if(enemy_x > high)
+        enemy_x = -1;
+        enemy_y = rand()%width;
+
+
+    //control enemy moving speed
+    static int speed = 0;
+    if(speed < 5)
+        speed ++;
+    if (speed == 5)
+    {
+        enemy_x++;
+        enemy_y++;
+        speed = 0;
+    }
+
+}
+
+void updateWithInput()
+{
+    char input;
+    if(kbhit()) //check for input
+    {
+        input = getch(); // get user input
+        if(input == 'a')
+            position_y--; // move left
+        if(input == 'd')
+            position_y++;// move right
+        if(input == 'w')
+            position_x--;//move up
+        if(input == 's')
+            position_x++;//move down
+        if(input == ' ') //fire bullet
+        {
+            bullet_x = position_x - 1; //bullet fire right above plane
+            bullet_y = position_y;
+        }
+    }
+}
 
 int main()
 {
-    int x = 20;
-    int y = 20;
-    char input;
-    int i, j;
-    int isFire = 0;
-
-    int target = 1;
-    int isKilled = 0;//靶子
-    int targetVel =1;
-    int targetDirection = 1; // 1向右边，-1向左边
-    int score = 0;
-
-
-    while(1)
+    starup();// initialization
+    while(1)// Game loop initialized
     {
-        system("cls");  // 清屏函数
-         target += targetVel * targetDirection;
+        show(); // draw picture
+        updateWithoutInput(); //update without user input
+        updateWithInput(); // update with user input
 
-        if(!isKilled)  //输出靶子
-        {
-            for (j=0;j<target;j++)
-
-                printf(" ");
-        printf("+ \n");
-
-        }
-        printf("Your Score: %d",score);
-
-        if (isFire == 0)  // 输出飞机上面的空行
-        {
-            for (i = 0; i < x; i++)
-                printf("\n");
-        }
-        else  // 输出飞机上面的激光
-        {
-            for (i = 0; i < x; i++)
-            {
-                for (j = 0; j < y; j++)
-                    printf(" ");
-                printf("  *\n");
-            }
-            if (y + 2 == target)
-                isKilled = 1;
-            if (isKilled ==1){
-                score ++;
-            }
-            isFire = 0;
-
-        }
-
-
-        // 画飞机
-        for (j = 0; j < y; j++)
-            printf(" ");
-        printf("  *\n");
-        for (j = 0; j < y; j++)
-            printf(" ");
-        printf("*****\n");
-
-        if (target + targetDirection > 50 || target + targetDirection < 1)
-            targetDirection *= -1;
-
-
-        if (kbhit())  // 判断是否输入
-        {
-            input = getch();
-            if (input == 'a')
-                y--;
-            if (input == 'd')
-                y++;
-            if (input == 'w')
-                x--;
-            if (input == 's')
-                x++;
-            if (input == ' ')
-                isFire = 1;
-        }
     }
-
+    HideCursor();
     return 0;
 }
