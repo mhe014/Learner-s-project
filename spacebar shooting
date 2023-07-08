@@ -8,7 +8,6 @@ void HideCursor()
     CONSOLE_CURSOR_INFO cursor_info = {1,0};//second 0 to hide cursor
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
 }
-
 //global variable
 int position_x,position_y; //plane position
 int high,width; //game window
@@ -16,7 +15,6 @@ int bullet_x,bullet_y;//bullet
 int enemy_x,enemy_y; //enemy
 int score; //add score
 int death; //record death
-
 
 void gotoxy(int x, int y) //move to x,y
 {
@@ -38,7 +36,6 @@ void starup()
     score = 0;
     death = 0;
 }
-
 
 void show() //show game
 {
@@ -78,7 +75,6 @@ void show() //show game
 
     printf("Score: %d\n",score);
     printf("Death: %d\n",death);
-
 }
 
 void updateWithoutInput() //update without user input
