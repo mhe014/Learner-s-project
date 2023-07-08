@@ -10,11 +10,13 @@ void HideCursor()
 }
 
 //global variable
-int position_x;position_y; //plane position
+int position_x,position_y; //plane position
 int high,width; //game window
 int bullet_x,bullet_y;//bullet
 int enemy_x,enemy_y; //enemy
 int score; //add score
+int death; //record death
+
 
 void gotoxy(int x, int y) //move to x,y
 {
@@ -30,20 +32,32 @@ void starup()
     high = 20;
     width = 30;
     position_x = high/2;
-    position_y = width/2;
+    position_y = width/2 - 2; // adjust for the plane's location
     enemy_x = 0;
-    enemy_y = position_y;
-    score =0;
+    enemy_y = rand() % (width-2) + 1; // ensure the enemy is always within boundary
+    score = 0;
+    death = 0;
 }
+
 
 void show() //show game
 {
     system("cls");
     int i,j;
+
+    // print top boundary
+    for(j = 0; j <= width + 2; j++)
+    printf("#");
+    printf("\n");
+
     for(i=0;i<high;i++)
     {
         for(j=0;j< width;j++)
         {
+            if(j == 0)
+                printf("#"); // print left boundary
+            else if(j == width + 1)
+                printf("#\n"); // newline at the end of the row
             if((i==position_x)&&(j==position_y))
                 printf("-*-");//print plane
             else if((i==enemy_x)&&(j==enemy_y))
@@ -54,9 +68,16 @@ void show() //show game
             else
                 printf(" "); //print space
         }
-        printf("\n");
+              // print right boundary
+        printf("#\n");
     }
+    // print bottom boundary
+    for(j = 0; j <= width + 1; j++)
+    printf("#");
+    printf("\n");
+
     printf("Score: %d\n",score);
+    printf("Death: %d\n",death);
 
 }
 
@@ -72,22 +93,28 @@ void updateWithoutInput() //update without user input
         bullet_x = -2; //invald bullet
     }
     if(enemy_x > high)
+    {
         enemy_x = -1;
         enemy_y = rand()%width;
+    }
+
+    if((position_x==enemy_x)&&(position_y==enemy_y))
+    {
+        death++;
+        position_x = high/2;
+        position_y = width/2;
+    }
 
 
     //control enemy moving speed
     static int speed = 0;
     if(speed < 5)
         speed ++;
-    if (speed == 5)
+    if (speed % 5 == 0) // Checks if speed is a multiple of 5
     {
-        enemy_x++;
-        enemy_y++;
-        speed = 0;
-    }
-
-}
+    enemy_x++;
+    speed = 0;
+}}
 
 void updateWithInput()
 {
@@ -95,13 +122,13 @@ void updateWithInput()
     if(kbhit()) //check for input
     {
         input = getch(); // get user input
-        if(input == 'a')
+        if(input == 'a' && position_y > 0)
             position_y--; // move left
-        if(input == 'd')
+        if(input == 'd' && position_y < width-1)
             position_y++;// move right
-        if(input == 'w')
+        if(input == 'w' && position_x > 0)
             position_x--;//move up
-        if(input == 's')
+        if(input == 's' && position_x < high-1)
             position_x++;//move down
         if(input == ' ') //fire bullet
         {
