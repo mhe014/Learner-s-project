@@ -3,7 +3,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <conio.h>
-
+#include <windows.h>
+#include <math.h>
 
 char randomLetter(void);
 int randomDigit(void);
@@ -11,12 +12,16 @@ char* randomPassword(int length) ;
 void passwordgeneration(int choice, int n, int returnToSelection);
 int passwordlength();
 void selectPasswordType(int length);
+int getMenuChoice() ;
 
 int main()
 {
-    srand(time(NULL));
-    int choice = 0;
-    int length = 0;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
+
+    srand(time(NULL)); // seed randomness
+    int choice = 0; // store user choice
+    int length = 0; // store password length
 
     while(1)
     {
@@ -25,41 +30,30 @@ int main()
     printf("2) 六位字母密码\n");
     printf("3) 六位字母数字标点混合密码 \n");
     printf("4) 自定义密码长度\n\n");
-    printf("输入数字选择1或2或3或4并按回车: ");
-    scanf("%d",&choice);
 
-
-
-    switch(choice)
+    switch(getMenuChoice())
     {
     case 1:
-        //TODO
         //call randomDigit() function and pass it to the matrix, produce digits
          passwordgeneration(1,6,0);
         break;
     case 2:
-        //TODO
+
         //call randomLetter() function and pass it to the matrix. produce letters
         passwordgeneration(2,6,0);
         break;
     case 3:
-        //TODO
         //call randomPassword() and randomDigit function and produce a mix
         passwordgeneration(3,6,0);
         break;
     case 4:
-        //TODO
         //call randomPassword() and randomDigit function and produce a mix
         length = passwordlength();
-
         selectPasswordType(length);
         break;
-
-
     }
 
-    }
-
+}
 
     return 0;
 }
@@ -99,12 +93,20 @@ char* randomPassword(int length)
 
 int passwordlength()
 {
-        int length;
-        printf("输入自定义密码长度: ");
-        scanf("%d", &length);
+    int length;
+    char inputBuffer[50]; // Buffer to store the input line
+
+    do {
+        printf("输入自定义密码长度 (1-20): ");
+        fgets(inputBuffer, sizeof(inputBuffer), stdin); // Read the entire line
+        if (sscanf(inputBuffer, "%d", &length) != 1 || length < 1 || length > 20) {
+            printf("无效长度，请重新输入.\n");
+        }
+    } while(length < 1 || length > 20);
 
     return length;
 }
+
 
 void passwordgeneration (int choice, int n, int returnToSelection)
 {
@@ -128,7 +130,7 @@ void passwordgeneration (int choice, int n, int returnToSelection)
                     }
                     else if (choice == 1 ||choice == 4)
                     {
-                        a[i][j] = randomDigit() + '0'; // Convert digit to ASCII character
+                        a[i][j] = randomDigit() + '0';
                     }
                     else if (choice == 2 ||choice == 4)
                     {
@@ -143,7 +145,7 @@ void passwordgeneration (int choice, int n, int returnToSelection)
                 }
                 printf("\n");
                 }
-                usleep(10000);
+                usleep(1000);
 
         if (kbhit())
         {
@@ -203,8 +205,31 @@ void selectPasswordType(int length)
     printf("3) 混合密码\n");
     printf("输入选择并按<回车>: ");
     scanf("%d", &typeChoice);
-    passwordgeneration(typeChoice , length,1);
+    clearInputBuffer();
+    passwordgeneration(typeChoice, length,1);
 }
+
+int getMenuChoice()
+{
+    int choice;
+    char inputBuffer[50]; // Buffer to store the input line
+
+    do {
+        printf("输入数字选择1或2或3或4并按回车: ");
+        fgets(inputBuffer, sizeof(inputBuffer), stdin); // Read the entire line
+        if (sscanf(inputBuffer, "%d", &choice) != 1 || choice < 1 || choice > 4) {
+            printf("无效选择，请重新输入.\n");
+        }
+    } while(choice < 1 || choice > 4);
+
+    return choice;
+}
+
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) ; // discard characters until newline or end-of-file
+}
+
 
 
 
