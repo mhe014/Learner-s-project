@@ -101,6 +101,7 @@ int passwordlength()
 {
         int length;
         printf("输入自定义密码长度: ");
+        scanf("%d", &length);
 
     return length;
 }
@@ -148,7 +149,7 @@ void passwordgeneration (int choice, int n, int returnToSelection)
         {
             if (getch() == ' ') //compare against key
             {
-                printf("随机密码:");
+                printf("随机密码: ");
                 for (int i = 0; i < 1; i++)
                 {
                     for (int j = 0; j < n; j++)
@@ -202,7 +203,7 @@ void selectPasswordType(int length)
     printf("3) 混合密码\n");
     printf("输入选择并按<回车>: ");
     scanf("%d", &typeChoice);
-    passwordgeneration(typeChoice, length,1);
+    passwordgeneration(typeChoice , length,1);
 }
 
 
